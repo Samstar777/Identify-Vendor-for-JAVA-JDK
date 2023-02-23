@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><extensionAttribute>
+<displayName>Identify Vendor for JAVA JDK</displayName>
+<description>This Jamf Pro Extension Attribute verifies if a Java JDK is installed. Once the presence of an installed JDK has been verified by checking the java_home environment variable, the JDK is checked for the vendor information. The EA will return one of the following values:&#13;
+&#13;
+None&#13;
+AdoptOpenJDK&#13;
+Amazon&#13;
+Apple&#13;
+Azul&#13;
+OpenJDK&#13;
+Oracle&#13;
+SAP&#13;
+Unknown</description>
+<dataType>string</dataType>
+<scriptContentsMac>#!/bin/bash&#13;
+&#13;
+# This extension attribute verifies if a Java JDK is installed. &#13;
+# Once the presence of an installed JDK has been &#13;
+# verified by checking java_home, the JDK is checked&#13;
+# for the vendor information. The EA will return one of&#13;
+# the following values:&#13;
+#&#13;
+# None&#13;
+# AdoptOpenJDK&#13;
+# Amazon&#13;
+# Apple&#13;
+# Azul&#13;
+# OpenJDK&#13;
+# Oracle&#13;
+# SAP&#13;
+# Unknown&#13;
+# &#13;
+#&#13;
+# None = No Java JDK is installed.&#13;
+# AdoptOpenJDK = AdoptOpenJDK is the Java JDK vendor.&#13;
+# Amazon = Amazon is the Java JDK vendor.&#13;
+# Apple = Apple is the Java JDK vendor.&#13;
+# Azul = Azul is the Java JDK vendor.&#13;
+# OpenJDK = OpenJDK is the Java JDK vendor.&#13;
+# Oracle = Oracle is the Java JDK vendor.&#13;
+# SAP = SAP is the Java JDK vendor.&#13;
+# Unknown = There is a Java JDK installed, but it is not from one of the listed vendors.&#13;
+   &#13;
+jdk_installed=$(/usr/libexec/java_home 2&gt;/dev/null)&#13;
+result=None&#13;
+&#13;
+if [[ -n "$jdk_installed" ]]; then&#13;
+&#13;
+   # If an installed JDK is detected, check to see if it's from a known vendor.&#13;
+&#13;
+   javaJDKVendor=$(defaults read "${jdk_installed%/*}/Info" CFBundleIdentifier | grep -Eo "adoptopenjdk|amazon|apple|azul|openjdk|oracle|sap" | head -1)&#13;
+   &#13;
+   if [[ "$javaJDKVendor" = "adoptopenjdk" ]]; then&#13;
+        result="AdoptOpenJDK"&#13;
+   elif [[ "$javaJDKVendor" = "amazon" ]]; then&#13;
+        result="Amazon"&#13;
+   elif [[ "$javaJDKVendor" = "apple" ]]; then&#13;
+        result="Apple"&#13;
+   elif [[ "$javaJDKVendor" = "azul" ]]; then&#13;
+        result="Azul"&#13;
+   elif [[ "$javaJDKVendor" = "openjdk" ]]; then&#13;
+        result="OpenJDK"&#13;
+   elif [[ "$javaJDKVendor" = "oracle" ]]; then&#13;
+        result="Oracle"&#13;
+   elif [[ "$javaJDKVendor" = "sap" ]]; then&#13;
+        result="SAP"&#13;
+   else&#13;
+        result="Unknown"&#13;
+   fi   &#13;
+fi&#13;
+&#13;
+echo "&lt;result&gt;$result&lt;/result&gt;"&#13;
+&#13;
+exit 0</scriptContentsMac>
+</extensionAttribute>
